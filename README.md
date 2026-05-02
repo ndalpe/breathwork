@@ -1,45 +1,70 @@
-# Breathwork Timer PWA v3
+# Breathwork Timer PWA v4
 
-A small Progressive Web App for experimenting with breathwork patterns.
+## New features
 
-## New in v3
+- Burger menu with two levels:
+  - Breathing pattern
+  - Choose voice
+- Voice choices:
+  - Heart
+  - Velvet
+  - Light
+- Voice clips are loaded from:
+  - `audio/heart`
+  - `audio/velvet`
+  - `audio/light`
+- Selected voice is saved in the browser with `localStorage`.
 
-- Supports pre-recorded voice clips from `/audio`
-- Falls back to browser text-to-speech if a clip is missing
-- Full-screen preset pattern menu
-- Large full-screen countdown during a session
-- Mute button for voice and chimes
-- Duration timer
-- Completed breath counter
-- One soft beep every minute, two soft beeps every 5 minutes
-- Offline support through a service worker
-- GitHub Pages ready
+## Add your generated ElevenLabs MP3 files
 
-## Deploy to GitHub Pages
+Copy your generated MP3 files into:
 
-1. Create a new GitHub repository.
-2. Upload these files to the repository root:
-   - `index.html`
-   - `manifest.json`
-   - `service-worker.js`
-   - `icon.svg`
-   - `VOICE-KIT.md`
-   - `/audio` folder with your MP3 voice clips
-3. In GitHub, go to **Settings → Pages**.
-4. Under **Build and deployment**, choose:
-   - Source: **Deploy from a branch**
-   - Branch: **main**
-   - Folder: **/root**
-5. Save.
-6. Open the GitHub Pages URL once it finishes deploying.
+```text
+audio/heart/
+audio/velvet/
+audio/light/
+```
 
-## Voice clips
+Each voice folder should contain:
 
-See `VOICE-KIT.md`.
+```text
+inhale.mp3
+hold.mp3
+exhale.mp3
+one.mp3
+two.mp3
+three.mp3
+four.mp3
+five.mp3
+six.mp3
+seven.mp3
+eight.mp3
+nine.mp3
+ten.mp3
+eleven.mp3
+twelve.mp3
+thirteen.mp3
+fourteen.mp3
+fifteen.mp3
+sixteen.mp3
+seventeen.mp3
+eighteen.mp3
+nineteen.mp3
+twenty.mp3
+twenty-one.mp3
+twenty-two.mp3
+twenty-three.mp3
+twenty-four.mp3
+twenty-five.mp3
+twenty-six.mp3
+twenty-seven.mp3
+twenty-eight.mp3
+twenty-nine.mp3
+thirty.mp3
+```
 
+If a clip cannot play, the app falls back to browser text-to-speech.
 
-## Placeholder audio files
+## GitHub Pages
 
-This package includes empty placeholder `.mp3` files in `/audio` so the full expected file structure is present.
-
-Until you replace them with real MP3 recordings, the app will fall back to browser text-to-speech.
+Upload the project contents to the root of your GitHub Pages repository.
