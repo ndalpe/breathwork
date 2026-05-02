@@ -14,6 +14,7 @@
   - `audio/velvet`
   - `audio/light`
 - Selected voice is saved in the browser with `localStorage`.
+- Timer area displays only the chosen breathing pattern name and timing.
 
 ## Add your generated ElevenLabs MP3 files
 

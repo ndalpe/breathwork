@@ -22,7 +22,7 @@
     .timer-card{min-height:42vh;border-radius:28px;background:radial-gradient(circle at center,rgba(255,255,255,.06),transparent 56%),var(--panel);box-shadow:0 20px 50px var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;position:sticky;top:12px;z-index:5}
     .phase{color:var(--muted);font-size:clamp(1.25rem,4vw,2rem);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
     .countdown{line-height:.9;font-size:clamp(7.5rem,34vw,18rem);font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;text-shadow:0 10px 35px rgba(0,0,0,.38)}
-    .pattern-name{margin-top:12px;color:var(--muted);font-size:1rem}
+    .pattern-name{margin-top:12px;color:var(--accent);font-size:clamp(1.15rem,4vw,1.65rem);font-weight:700}.pattern-times{margin-top:4px;color:var(--muted);font-size:clamp(.95rem,3vw,1.15rem);font-variant-numeric:tabular-nums}
     .controls{display:flex;gap:10px;width:100%;margin-top:20px}
     button.primary{width:100%;background:#6a6a6a;border-color:#8a8a8a;font-size:1.1rem;padding:15px 18px}
     button.stop{background:#585858}
@@ -95,6 +95,7 @@
         <div id="phase" class="phase">Ready</div>
         <div id="countdown" class="countdown">0</div>
         <div id="patternName" class="pattern-name">Choose a pattern or create your own.</div>
+        <div id="patternTimes" class="pattern-times">4-7-8-0</div>
         <div class="controls"><button id="startStopButton" class="primary" type="button">Start</button></div>
       </section>
       <section class="settings">
@@ -107,7 +108,6 @@
             <label>Hold <input id="holdAfterExhaleInput" type="number" min="0" max="300" step="1" value="0" inputmode="numeric" /></label>
           </div>
           <div class="controls"><button id="applyCustomButton" type="button">Use custom pattern</button></div>
-          <p class="hint">Use 0 for any step you want to skip. Voice clips are loaded from <code>audio/heart</code>, <code>audio/velvet</code>, and <code>audio/light</code>.</p>
         </div>
       </section>
     </main>
@@ -157,7 +157,7 @@
     let fallbackVoice = null;
 
     const $ = id => document.getElementById(id);
-    const phaseEl=$("phase"), countdownEl=$("countdown"), patternNameEl=$("patternName"), startStopButton=$("startStopButton"), muteButton=$("muteButton"), sessionMuteButton=$("sessionMuteButton");
+    const phaseEl=$("phase"), countdownEl=$("countdown"), patternNameEl=$("patternName"), patternTimesEl=$("patternTimes"), startStopButton=$("startStopButton"), muteButton=$("muteButton"), sessionMuteButton=$("sessionMuteButton");
     const presetGrid=$("presetGrid"), voiceGrid=$("voiceGrid"), menu=$("menu"), menuTitle=$("menuTitle"), menuHome=$("menuHome"), patternsPage=$("patternsPage"), voicesPage=$("voicesPage"), backMenuButton=$("backMenuButton");
     const durationDisplay=$("durationDisplay"), breathCounterDisplay=$("breathCounterDisplay");
     const inputs=[$("inhaleInput"),$("holdAfterInhaleInput"),$("exhaleInput"),$("holdAfterExhaleInput")];
@@ -257,7 +257,8 @@
     function render(){
       phaseEl.textContent=remaining>0?phaseLabels[phaseIndex]:"Ready";
       countdownEl.textContent=remaining;
-      patternNameEl.textContent=`${activePattern.name} · ${activePattern.times.join("-")} sec · ${voices[selectedVoice].name} voice`;
+      patternNameEl.textContent=activePattern.name;
+      patternTimesEl.textContent=activePattern.times.join("-");
       durationDisplay.textContent=formatDuration(sessionSeconds);
       breathCounterDisplay.textContent=`${completedBreaths} ${completedBreaths===1?"breath":"breaths"}`;
       startStopButton.textContent=running?"Stop":"Start"; startStopButton.classList.toggle("stop",running); updateMuteButtons();
@@ -316,7 +317,7 @@
       voiceGrid.innerHTML="";
       Object.entries(voices).forEach(([key,v])=>{
         const b=document.createElement("button"); b.className="voice-card"; b.type="button";
-        b.innerHTML=`<strong>${v.name}</strong><span>${v.description}</span><small>Folder: audio/${key}</small>${selectedVoice===key?'<div class="selected-pill">Selected</div>':""}`;
+        b.innerHTML=`<strong>${v.name}</strong><span>${v.description}</span>${selectedVoice===key?'<div class="selected-pill">Selected</div>':""}`;
         b.addEventListener("click",()=>setVoice(key));
         voiceGrid.appendChild(b);
       });
