@@ -62,12 +62,6 @@
       letter-spacing: 0.02em;
     }
 
-    .top-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
     .icon-button {
       border: 1px solid #6a6a6a;
       border-radius: 999px;
@@ -163,9 +157,7 @@
       padding: 15px 18px;
     }
 
-    button.stop {
-      background: #585858;
-    }
+    button.stop { background: #585858; }
 
     .settings {
       display: grid;
@@ -234,9 +226,7 @@
       overflow-y: auto;
     }
 
-    .preset-menu.open {
-      transform: translateX(0);
-    }
+    .preset-menu.open { transform: translateX(0); }
 
     .preset-menu-header {
       display: flex;
@@ -328,9 +318,7 @@
       min-height: 100vh;
     }
 
-    body.session-active .session-topbar {
-      display: flex;
-    }
+    body.session-active .session-topbar { display: flex; }
 
     body.session-active .timer-card {
       min-height: 100vh;
@@ -370,15 +358,9 @@
       .custom-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-      button, input {
-        padding: 11px 12px;
-      }
-      .preset-menu {
-        padding: 12px;
-      }
-      .preset-grid {
-        grid-template-columns: 1fr;
-      }
+      button, input { padding: 11px 12px; }
+      .preset-menu { padding: 12px; }
+      .preset-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -396,14 +378,14 @@
       <div id="durationDisplay">00:00</div>
       <div id="breathCounterDisplay">0 breaths</div>
     </div>
-    <button id="sessionMuteButton" class="icon-button" type="button" aria-label="Mute spoken countdown">🔊</button>
+    <button id="sessionMuteButton" class="icon-button" type="button" aria-label="Mute voice and chimes">🔊</button>
   </div>
 
   <div class="app">
     <header>
       <button id="openMenuButton" class="icon-button" type="button" aria-label="Open breathing pattern menu">☰</button>
       <h1>Breathwork Timer</h1>
-      <button id="muteButton" class="icon-button" type="button" aria-label="Mute spoken countdown">🔊</button>
+      <button id="muteButton" class="icon-button" type="button" aria-label="Mute voice and chimes">🔊</button>
     </header>
 
     <main>
@@ -436,7 +418,7 @@
           <div class="controls">
             <button id="applyCustomButton" type="button">Use custom pattern</button>
           </div>
-          <p class="hint">Use 0 for any step you want to skip. Open ☰ to choose a common pattern.</p>
+          <p class="hint">Use 0 for any step you want to skip. Voice clips in <code>/audio</code> will be used automatically when present.</p>
         </div>
       </section>
     </main>
@@ -448,59 +430,60 @@
 
   <script>
     const presets = [
-      {
-        name: "Box breathing",
-        times: [4, 4, 4, 4],
-        description: "Balanced and steady, useful when you want calm focus."
-      },
-      {
-        name: "4-7-8 breathing",
-        times: [4, 7, 8, 0],
-        description: "A longer exhale pattern often used for winding down."
-      },
-      {
-        name: "Coherent breathing",
-        times: [5, 0, 5, 0],
-        description: "Simple rhythmic breathing for a smooth, regulated feeling."
-      },
-      {
-        name: "Relaxing 4-6",
-        times: [4, 0, 6, 0],
-        description: "A gentle longer-exhale pattern for softening tension."
-      },
-      {
-        name: "Triangle breathing",
-        times: [4, 4, 4, 0],
-        description: "Three equal sides that feel structured without a final hold."
-      },
-      {
-        name: "Energizing 6-2-4",
-        times: [6, 2, 4, 0],
-        description: "A fuller inhale pattern for moments when you want more brightness."
-      },
-      {
-        name: "Buteyko-style light breath",
-        times: [3, 0, 3, 2],
-        description: "Soft nasal breathing with a small pause after exhale."
-      },
-      {
-        name: "Gentle sleep wave",
-        times: [4, 2, 8, 0],
-        description: "A quiet pattern with an elongated exhale for bedtime."
-      },
-      {
-        name: "Equal breathing",
-        times: [4, 0, 4, 0],
-        description: "A very simple even rhythm when you want minimal structure."
-      },
-      {
-        name: "Long exhale",
-        times: [3, 0, 6, 0],
-        description: "A compact pattern for slowing down without long holds."
-      }
+      { name: "Box breathing", times: [4, 4, 4, 4], description: "Balanced and steady, useful when you want calm focus." },
+      { name: "4-7-8 breathing", times: [4, 7, 8, 0], description: "A longer exhale pattern often used for winding down." },
+      { name: "Coherent breathing", times: [5, 0, 5, 0], description: "Simple rhythmic breathing for a smooth, regulated feeling." },
+      { name: "Relaxing 4-6", times: [4, 0, 6, 0], description: "A gentle longer-exhale pattern for softening tension." },
+      { name: "Triangle breathing", times: [4, 4, 4, 0], description: "Three equal sides that feel structured without a final hold." },
+      { name: "Energizing 6-2-4", times: [6, 2, 4, 0], description: "A fuller inhale pattern for moments when you want more brightness." },
+      { name: "Buteyko-style light breath", times: [3, 0, 3, 2], description: "Soft nasal breathing with a small pause after exhale." },
+      { name: "Gentle sleep wave", times: [4, 2, 8, 0], description: "A quiet pattern with an elongated exhale for bedtime." },
+      { name: "Equal breathing", times: [4, 0, 4, 0], description: "A very simple even rhythm when you want minimal structure." },
+      { name: "Long exhale", times: [3, 0, 6, 0], description: "A compact pattern for slowing down without long holds." }
     ];
 
     const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
+    const audioBasePath = "./audio/";
+
+    const audioClipNames = {
+      inhale: "inhale.mp3",
+      hold: "hold.mp3",
+      exhale: "exhale.mp3",
+      1: "one.mp3",
+      2: "two.mp3",
+      3: "three.mp3",
+      4: "four.mp3",
+      5: "five.mp3",
+      6: "six.mp3",
+      7: "seven.mp3",
+      8: "eight.mp3",
+      9: "nine.mp3",
+      10: "ten.mp3",
+      11: "eleven.mp3",
+      12: "twelve.mp3",
+      13: "thirteen.mp3",
+      14: "fourteen.mp3",
+      15: "fifteen.mp3",
+      16: "sixteen.mp3",
+      17: "seventeen.mp3",
+      18: "eighteen.mp3",
+      19: "nineteen.mp3",
+      20: "twenty.mp3",
+      21: "twenty-one.mp3",
+      22: "twenty-two.mp3",
+      23: "twenty-three.mp3",
+      24: "twenty-four.mp3",
+      25: "twenty-five.mp3",
+      26: "twenty-six.mp3",
+      27: "twenty-seven.mp3",
+      28: "twenty-eight.mp3",
+      29: "twenty-nine.mp3",
+      30: "thirty.mp3"
+    };
+
+    const clips = {};
+    let activeClip = null;
+
     let activePattern = { name: "4-7-8 breathing", times: [4, 7, 8, 0] };
     let phaseIndex = 0;
     let remaining = activePattern.times[phaseIndex];
@@ -512,6 +495,7 @@
     let muted = localStorage.getItem("breathwork-muted") === "true";
 
     let audioContext = null;
+    let voice = null;
 
     const phaseEl = document.getElementById("phase");
     const countdownEl = document.getElementById("countdown");
@@ -530,6 +514,32 @@
       document.getElementById("exhaleInput"),
       document.getElementById("holdAfterExhaleInput")
     ];
+
+    function preloadVoiceClips() {
+      Object.entries(audioClipNames).forEach(([key, filename]) => {
+        const audio = new Audio(audioBasePath + filename);
+        audio.preload = "auto";
+        audio.volume = 0.9;
+        clips[key] = audio;
+      });
+    }
+
+    function loadVoice() {
+      if (!("speechSynthesis" in window)) return;
+      const voices = speechSynthesis.getVoices();
+      voice =
+        voices.find(v => v.name.toLowerCase().includes("samantha")) ||
+        voices.find(v => v.name.toLowerCase().includes("google us english")) ||
+        voices.find(v => v.name.toLowerCase().includes("female")) ||
+        voices.find(v => v.lang && v.lang.startsWith("en")) ||
+        voices[0] ||
+        null;
+    }
+
+    if ("speechSynthesis" in window) {
+      speechSynthesis.onvoiceschanged = loadVoice;
+      loadVoice();
+    }
 
     function validSteps(times) {
       return times.map(Number).filter(n => Number.isFinite(n) && n > 0);
@@ -593,22 +603,72 @@
       }
     }
 
-    function speak(text) {
+    function speakFallback(text) {
       if (muted || !("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
+
+      speechSynthesis.cancel();
+
       const utterance = new SpeechSynthesisUtterance(String(text));
-      utterance.rate = 0.95;
-      utterance.pitch = 1;
-      utterance.volume = 0.9;
-      window.speechSynthesis.speak(utterance);
+      utterance.voice = voice;
+      utterance.rate = 0.68;
+      utterance.pitch = 1.12;
+      utterance.volume = 0.82;
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function playClip(key, fallbackText) {
+      if (muted) return;
+
+      const clip = clips[key];
+
+      if (!clip) {
+        speakFallback(fallbackText);
+        return;
+      }
+
+      if ("speechSynthesis" in window) speechSynthesis.cancel();
+
+      try {
+        if (activeClip) {
+          activeClip.pause();
+          activeClip.currentTime = 0;
+        }
+
+        activeClip = clip.cloneNode(true);
+        activeClip.volume = 0.9;
+
+        const playPromise = activeClip.play();
+
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => speakFallback(fallbackText));
+        }
+      } catch (error) {
+        speakFallback(fallbackText);
+      }
+    }
+
+    function speakCue(text) {
+      const normalized = String(text).toLowerCase();
+
+      if (normalized === "inhale") return playClip("inhale", "Inhale");
+      if (normalized === "exhale") return playClip("exhale", "Exhale");
+      if (normalized === "hold") return playClip("hold", "Hold");
+
+      const number = Number(text);
+      if (Number.isInteger(number) && number >= 1 && number <= 30) {
+        return playClip(number, String(number));
+      }
+
+      speakFallback(text);
     }
 
     function updateMuteButtons() {
       const icon = muted ? "🔇" : "🔊";
       muteButton.textContent = icon;
       sessionMuteButton.textContent = icon;
-      muteButton.setAttribute("aria-label", muted ? "Unmute sounds" : "Mute sounds");
-      sessionMuteButton.setAttribute("aria-label", muted ? "Unmute sounds" : "Mute sounds");
+      muteButton.setAttribute("aria-label", muted ? "Unmute voice and chimes" : "Mute voice and chimes");
+      sessionMuteButton.setAttribute("aria-label", muted ? "Unmute voice and chimes" : "Mute voice and chimes");
     }
 
     function currentDuration() {
@@ -673,9 +733,9 @@
 
       if (remaining <= 0) {
         moveToNextNonZeroPhase();
-        speak(phaseLabels[phaseIndex]);
+        speakCue(phaseLabels[phaseIndex]);
       } else {
-        speak(remaining);
+        setTimeout(() => speakCue(remaining), 120);
       }
 
       render();
@@ -692,7 +752,7 @@
         audioContext.resume();
       }
 
-      speak(phaseLabels[phaseIndex]);
+      speakCue(phaseLabels[phaseIndex]);
       render();
 
       clearInterval(intervalId);
@@ -705,7 +765,12 @@
       intervalId = null;
       document.body.classList.remove("session-active");
 
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (activeClip) {
+        activeClip.pause();
+        activeClip.currentTime = 0;
+      }
+
+      if ("speechSynthesis" in window) speechSynthesis.cancel();
 
       if (resetSession) {
         phaseIndex = getFirstActivePhaseIndex();
@@ -720,7 +785,16 @@
     function toggleMute() {
       muted = !muted;
       localStorage.setItem("breathwork-muted", String(muted));
-      if (muted && "speechSynthesis" in window) window.speechSynthesis.cancel();
+
+      if (muted) {
+        if (activeClip) {
+          activeClip.pause();
+          activeClip.currentTime = 0;
+        }
+
+        if ("speechSynthesis" in window) speechSynthesis.cancel();
+      }
+
       render();
     }
 
@@ -778,6 +852,7 @@
       });
     }
 
+    preloadVoiceClips();
     buildPresets();
     setPattern(activePattern);
   </script>

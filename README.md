@@ -1,14 +1,14 @@
-# Breathwork Timer PWA
+# Breathwork Timer PWA v3
 
 A small Progressive Web App for experimenting with breathwork patterns.
 
-## Features
+## New in v3
 
-- Custom inhale / hold / exhale / hold timing
+- Supports pre-recorded voice clips from `/audio`
+- Falls back to browser text-to-speech if a clip is missing
 - Full-screen preset pattern menu
 - Large full-screen countdown during a session
-- Spoken countdown using the browser Speech Synthesis API
-- Mute button for speech and chimes
+- Mute button for voice and chimes
 - Duration timer
 - Completed breath counter
 - One soft beep every minute, two soft beeps every 5 minutes
@@ -23,6 +23,8 @@ A small Progressive Web App for experimenting with breathwork patterns.
    - `manifest.json`
    - `service-worker.js`
    - `icon.svg`
+   - `VOICE-KIT.md`
+   - `/audio` folder with your MP3 voice clips
 3. In GitHub, go to **Settings → Pages**.
 4. Under **Build and deployment**, choose:
    - Source: **Deploy from a branch**
@@ -31,6 +33,13 @@ A small Progressive Web App for experimenting with breathwork patterns.
 5. Save.
 6. Open the GitHub Pages URL once it finishes deploying.
 
-## Note
+## Voice clips
 
-Speech synthesis and audio chimes may start only after pressing Start because mobile browsers often require a user gesture before audio can play.
+See `VOICE-KIT.md`.
+
+
+## Placeholder audio files
+
+This package includes empty placeholder `.mp3` files in `/audio` so the full expected file structure is present.
+
+Until you replace them with real MP3 recordings, the app will fall back to browser text-to-speech.
