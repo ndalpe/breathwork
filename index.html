@@ -17,7 +17,6 @@
       --button: #555;
       --button-hover: #666;
       --accent: #cfcfcf;
-      --danger: #bdbdbd;
       --shadow: rgba(0, 0, 0, 0.35);
     }
 
@@ -35,6 +34,7 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
+      overflow-x: hidden;
     }
 
     .app {
@@ -44,9 +44,11 @@
       display: grid;
       grid-template-rows: auto 1fr auto;
       gap: 18px;
+      transition: padding 180ms ease;
     }
 
-    header {
+    header,
+    .session-topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -58,6 +60,12 @@
       font-size: clamp(1.35rem, 4vw, 2rem);
       font-weight: 700;
       letter-spacing: 0.02em;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
 
     .icon-button {
@@ -97,6 +105,7 @@
       position: sticky;
       top: 12px;
       z-index: 5;
+      transition: all 180ms ease;
     }
 
     .phase {
@@ -124,13 +133,12 @@
 
     .controls {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
-      justify-content: center;
+      width: 100%;
       margin-top: 20px;
     }
 
-    button, select, input {
+    button, input {
       border: 1px solid #6b6b6b;
       border-radius: 14px;
       background: var(--button);
@@ -148,13 +156,15 @@
     button:hover { background: var(--button-hover); }
 
     button.primary {
+      width: 100%;
       background: #6a6a6a;
       border-color: #8a8a8a;
+      font-size: 1.1rem;
+      padding: 15px 18px;
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    button.stop {
+      background: #585858;
     }
 
     .settings {
@@ -174,42 +184,6 @@
       margin: 0 0 12px;
       font-size: 1.1rem;
       color: var(--accent);
-    }
-
-    .preset-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 10px;
-    }
-
-    .preset {
-      text-align: left;
-      background: var(--panel-2);
-      border-radius: 16px;
-      padding: 13px;
-      min-height: 112px;
-    }
-
-    .preset strong {
-      display: block;
-      font-size: 1rem;
-      color: var(--accent);
-      margin-bottom: 5px;
-    }
-
-    .preset span {
-      display: block;
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.35;
-      font-weight: 450;
-    }
-
-    .preset small {
-      display: block;
-      color: var(--text);
-      margin-top: 8px;
-      font-variant-numeric: tabular-nums;
     }
 
     .custom-grid {
@@ -245,24 +219,189 @@
       padding-bottom: 10px;
     }
 
+    .preset-menu {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: var(--bg);
+      color: var(--text);
+      transform: translateX(-100%);
+      transition: transform 220ms ease;
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .preset-menu.open {
+      transform: translateX(0);
+    }
+
+    .preset-menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      padding-bottom: 10px;
+      z-index: 2;
+    }
+
+    .preset-menu h2 {
+      margin: 0;
+      font-size: clamp(1.4rem, 6vw, 2.4rem);
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      align-content: start;
+    }
+
+    .preset {
+      text-align: left;
+      background: var(--panel);
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 124px;
+    }
+
+    .preset strong {
+      display: block;
+      font-size: 1.08rem;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .preset span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.38;
+      font-weight: 450;
+    }
+
+    .preset small {
+      display: block;
+      color: var(--text);
+      margin-top: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .session-topbar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 14px;
+      z-index: 20;
+      background: linear-gradient(to bottom, rgba(47,47,47,0.98), rgba(47,47,47,0.65), transparent);
+    }
+
+    .session-stats {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(0.95rem, 3.5vw, 1.2rem);
+      line-height: 1.25;
+    }
+
+    body.session-active .app {
+      width: 100%;
+      padding: 0;
+      display: block;
+    }
+
+    body.session-active header,
+    body.session-active .settings,
+    body.session-active footer,
+    body.session-active .pattern-name {
+      display: none;
+    }
+
+    body.session-active main {
+      display: block;
+      min-height: 100vh;
+    }
+
+    body.session-active .session-topbar {
+      display: flex;
+    }
+
+    body.session-active .timer-card {
+      min-height: 100vh;
+      width: 100%;
+      border-radius: 0;
+      position: static;
+      box-shadow: none;
+      padding: 88px 18px 24px;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,0.07), transparent 58%),
+        var(--bg);
+    }
+
+    body.session-active .countdown {
+      font-size: clamp(10rem, 44vw, 25rem);
+    }
+
+    body.session-active .phase {
+      font-size: clamp(1.4rem, 5vw, 2.4rem);
+    }
+
+    body.session-active .controls {
+      position: fixed;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      z-index: 25;
+      margin: 0;
+    }
+
     @media (max-width: 640px) {
       .app { padding: 12px; gap: 12px; }
       .timer-card {
-        min-height: 48vh;
+        min-height: 43vh;
         border-radius: 22px;
       }
       .custom-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-      button, select, input {
+      button, input {
         padding: 11px 12px;
+      }
+      .preset-menu {
+        padding: 12px;
+      }
+      .preset-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
+  <div class="preset-menu" id="presetMenu" aria-hidden="true">
+    <div class="preset-menu-header">
+      <h2>Breathing patterns</h2>
+      <button id="closeMenuButton" class="icon-button" type="button" aria-label="Close breathing pattern menu">×</button>
+    </div>
+    <div id="presetGrid" class="preset-grid"></div>
+  </div>
+
+  <div class="session-topbar" aria-live="polite">
+    <div class="session-stats">
+      <div id="durationDisplay">00:00</div>
+      <div id="breathCounterDisplay">0 breaths</div>
+    </div>
+    <button id="sessionMuteButton" class="icon-button" type="button" aria-label="Mute spoken countdown">🔊</button>
+  </div>
+
   <div class="app">
     <header>
+      <button id="openMenuButton" class="icon-button" type="button" aria-label="Open breathing pattern menu">☰</button>
       <h1>Breathwork Timer</h1>
       <button id="muteButton" class="icon-button" type="button" aria-label="Mute spoken countdown">🔊</button>
     </header>
@@ -273,19 +412,11 @@
         <div id="countdown" class="countdown">0</div>
         <div id="patternName" class="pattern-name">Choose a pattern or create your own.</div>
         <div class="controls">
-          <button id="startPauseButton" class="primary" type="button">Start</button>
-          <button id="resetButton" type="button">Reset</button>
-          <button id="nextButton" type="button">Next step</button>
+          <button id="startStopButton" class="primary" type="button">Start</button>
         </div>
       </section>
 
       <section class="settings">
-        <div class="panel">
-          <h2>Common patterns</h2>
-          <div id="presetGrid" class="preset-grid"></div>
-          <p class="hint">Tip: choose the pattern that matches the state you want to invite, not the state you want to force. Tiny rudder, large ocean.</p>
-        </div>
-
         <div class="panel">
           <h2>Custom pattern</h2>
           <div class="custom-grid">
@@ -305,7 +436,7 @@
           <div class="controls">
             <button id="applyCustomButton" type="button">Use custom pattern</button>
           </div>
-          <p class="hint">Use 0 for any step you want to skip.</p>
+          <p class="hint">Use 0 for any step you want to skip. Open ☰ to choose a common pattern.</p>
         </div>
       </section>
     </main>
@@ -356,6 +487,16 @@
         name: "Gentle sleep wave",
         times: [4, 2, 8, 0],
         description: "A quiet pattern with an elongated exhale for bedtime."
+      },
+      {
+        name: "Equal breathing",
+        times: [4, 0, 4, 0],
+        description: "A very simple even rhythm when you want minimal structure."
+      },
+      {
+        name: "Long exhale",
+        times: [3, 0, 6, 0],
+        description: "A compact pattern for slowing down without long holds."
       }
     ];
 
@@ -363,18 +504,25 @@
     let activePattern = { name: "4-7-8 breathing", times: [4, 7, 8, 0] };
     let phaseIndex = 0;
     let remaining = activePattern.times[phaseIndex];
+
     let running = false;
-    let muted = localStorage.getItem("breathwork-muted") === "true";
     let intervalId = null;
+    let sessionSeconds = 0;
+    let completedBreaths = 0;
+    let muted = localStorage.getItem("breathwork-muted") === "true";
+
+    let audioContext = null;
 
     const phaseEl = document.getElementById("phase");
     const countdownEl = document.getElementById("countdown");
     const patternNameEl = document.getElementById("patternName");
-    const startPauseButton = document.getElementById("startPauseButton");
-    const resetButton = document.getElementById("resetButton");
-    const nextButton = document.getElementById("nextButton");
+    const startStopButton = document.getElementById("startStopButton");
     const muteButton = document.getElementById("muteButton");
+    const sessionMuteButton = document.getElementById("sessionMuteButton");
     const presetGrid = document.getElementById("presetGrid");
+    const presetMenu = document.getElementById("presetMenu");
+    const durationDisplay = document.getElementById("durationDisplay");
+    const breathCounterDisplay = document.getElementById("breathCounterDisplay");
 
     const inputs = [
       document.getElementById("inhaleInput"),
@@ -394,6 +542,57 @@
       });
     }
 
+    function getFirstActivePhaseIndex() {
+      const index = activePattern.times.findIndex(time => time > 0);
+      return index >= 0 ? index : 0;
+    }
+
+    function formatDuration(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function ensureAudioContext() {
+      if (audioContext) return audioContext;
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return null;
+      audioContext = new AudioContext();
+      return audioContext;
+    }
+
+    function beep(delay = 0) {
+      if (muted) return;
+
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
+
+      const startAt = ctx.currentTime + delay;
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(660, startAt);
+
+      gain.gain.setValueAtTime(0.0001, startAt);
+      gain.gain.exponentialRampToValueAtTime(0.035, startAt + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.22);
+
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.start(startAt);
+      oscillator.stop(startAt + 0.24);
+    }
+
+    function minuteChime() {
+      if (sessionSeconds > 0 && sessionSeconds % 300 === 0) {
+        beep(0);
+        beep(0.34);
+      } else if (sessionSeconds > 0 && sessionSeconds % 60 === 0) {
+        beep(0);
+      }
+    }
+
     function speak(text) {
       if (muted || !("speechSynthesis" in window)) return;
       window.speechSynthesis.cancel();
@@ -404,9 +603,12 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    function updateMuteButton() {
-      muteButton.textContent = muted ? "🔇" : "🔊";
-      muteButton.setAttribute("aria-label", muted ? "Unmute spoken countdown" : "Mute spoken countdown");
+    function updateMuteButtons() {
+      const icon = muted ? "🔇" : "🔊";
+      muteButton.textContent = icon;
+      sessionMuteButton.textContent = icon;
+      muteButton.setAttribute("aria-label", muted ? "Unmute sounds" : "Mute sounds");
+      sessionMuteButton.setAttribute("aria-label", muted ? "Unmute sounds" : "Mute sounds");
     }
 
     function currentDuration() {
@@ -414,13 +616,21 @@
     }
 
     function moveToNextNonZeroPhase() {
+      const previousPhase = phaseIndex;
+
       for (let i = 0; i < 4; i++) {
         phaseIndex = (phaseIndex + 1) % 4;
+
+        if (phaseIndex === 0 && previousPhase !== 0) {
+          completedBreaths += 1;
+        }
+
         if (activePattern.times[phaseIndex] > 0) {
           remaining = activePattern.times[phaseIndex];
           return;
         }
       }
+
       remaining = 0;
     }
 
@@ -434,12 +644,11 @@
         activePattern.times = [4, 0, 4, 0];
       }
 
-      phaseIndex = activePattern.times.findIndex(time => time > 0);
-      if (phaseIndex < 0) phaseIndex = 0;
+      phaseIndex = getFirstActivePhaseIndex();
       remaining = currentDuration();
-      running = false;
-      clearInterval(intervalId);
-      intervalId = null;
+      sessionSeconds = 0;
+      completedBreaths = 0;
+      stop(false);
       render();
     }
 
@@ -447,12 +656,18 @@
       phaseEl.textContent = remaining > 0 ? phaseLabels[phaseIndex] : "Ready";
       countdownEl.textContent = remaining;
       patternNameEl.textContent = `${activePattern.name} · ${activePattern.times.join("-")} sec`;
-      startPauseButton.textContent = running ? "Pause" : "Start";
-      updateMuteButton();
+      durationDisplay.textContent = formatDuration(sessionSeconds);
+      breathCounterDisplay.textContent = `${completedBreaths} ${completedBreaths === 1 ? "breath" : "breaths"}`;
+      startStopButton.textContent = running ? "Stop" : "Start";
+      startStopButton.classList.toggle("stop", running);
+      updateMuteButtons();
     }
 
     function tick() {
       if (!running) return;
+
+      sessionSeconds += 1;
+      minuteChime();
 
       remaining -= 1;
 
@@ -468,7 +683,15 @@
 
     function start() {
       if (validSteps(activePattern.times).length === 0) return;
+
       running = true;
+      document.body.classList.add("session-active");
+
+      ensureAudioContext();
+      if (audioContext && audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+
       speak(phaseLabels[phaseIndex]);
       render();
 
@@ -476,30 +699,44 @@
       intervalId = setInterval(tick, 1000);
     }
 
-    function pause() {
+    function stop(resetSession = true) {
       running = false;
       clearInterval(intervalId);
       intervalId = null;
+      document.body.classList.remove("session-active");
+
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+      if (resetSession) {
+        phaseIndex = getFirstActivePhaseIndex();
+        remaining = currentDuration();
+        sessionSeconds = 0;
+        completedBreaths = 0;
+      }
+
       render();
     }
 
-    function reset() {
-      pause();
-      phaseIndex = activePattern.times.findIndex(time => time > 0);
-      if (phaseIndex < 0) phaseIndex = 0;
-      remaining = currentDuration();
+    function toggleMute() {
+      muted = !muted;
+      localStorage.setItem("breathwork-muted", String(muted));
+      if (muted && "speechSynthesis" in window) window.speechSynthesis.cancel();
       render();
     }
 
-    function nextStep() {
-      moveToNextNonZeroPhase();
-      speak(phaseLabels[phaseIndex]);
-      render();
+    function openMenu() {
+      presetMenu.classList.add("open");
+      presetMenu.setAttribute("aria-hidden", "false");
+    }
+
+    function closeMenu() {
+      presetMenu.classList.remove("open");
+      presetMenu.setAttribute("aria-hidden", "true");
     }
 
     function buildPresets() {
       presetGrid.innerHTML = "";
+
       presets.forEach(preset => {
         const button = document.createElement("button");
         button.className = "preset";
@@ -509,23 +746,25 @@
           <span>${preset.description}</span>
           <small>${preset.times.join("-")} sec</small>
         `;
+
         button.addEventListener("click", () => {
           inputs.forEach((input, index) => input.value = preset.times[index]);
           setPattern(preset);
+          closeMenu();
         });
+
         presetGrid.appendChild(button);
       });
     }
 
-    startPauseButton.addEventListener("click", () => running ? pause() : start());
-    resetButton.addEventListener("click", reset);
-    nextButton.addEventListener("click", nextStep);
+    startStopButton.addEventListener("click", () => running ? stop(true) : start());
+    muteButton.addEventListener("click", toggleMute);
+    sessionMuteButton.addEventListener("click", toggleMute);
+    document.getElementById("openMenuButton").addEventListener("click", openMenu);
+    document.getElementById("closeMenuButton").addEventListener("click", closeMenu);
 
-    muteButton.addEventListener("click", () => {
-      muted = !muted;
-      localStorage.setItem("breathwork-muted", String(muted));
-      if (muted && "speechSynthesis" in window) window.speechSynthesis.cancel();
-      render();
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeMenu();
     });
 
     document.getElementById("applyCustomButton").addEventListener("click", () => {

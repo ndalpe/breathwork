@@ -5,10 +5,13 @@ A small Progressive Web App for experimenting with breathwork patterns.
 ## Features
 
 - Custom inhale / hold / exhale / hold timing
-- Common preset patterns with short descriptions
-- Large always-visible countdown
+- Full-screen preset pattern menu
+- Large full-screen countdown during a session
 - Spoken countdown using the browser Speech Synthesis API
-- Mute button
+- Mute button for speech and chimes
+- Duration timer
+- Completed breath counter
+- One soft beep every minute, two soft beeps every 5 minutes
 - Offline support through a service worker
 - GitHub Pages ready
 
@@ -30,4 +33,4 @@ A small Progressive Web App for experimenting with breathwork patterns.
 
 ## Note
 
-Speech synthesis support varies by browser. On mobile, speech may start only after pressing Start because browsers require a user gesture before audio.
+Speech synthesis and audio chimes may start only after pressing Start because mobile browsers often require a user gesture before audio can play.
