@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#2f2f2f" />
+  <meta name="description" content="A simple offline breathwork timer with custom and preset breathing patterns." />
+  <link rel="manifest" href="manifest.json" />
+  <title>Breathwork Timer</title>
+  <style>
+    :root {
+      --bg: #2f2f2f;
+      --panel: #3a3a3a;
+      --panel-2: #444;
+      --text: #d8d8d8;
+      --muted: #a8a8a8;
+      --button: #555;
+      --button-hover: #666;
+      --accent: #cfcfcf;
+      --danger: #bdbdbd;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      width: min(960px, 100%);
+      min-height: 100vh;
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 4vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .icon-button {
+      border: 1px solid #6a6a6a;
+      border-radius: 999px;
+      background: var(--button);
+      color: var(--text);
+      width: 46px;
+      height: 46px;
+      font-size: 1.15rem;
+      cursor: pointer;
+      box-shadow: 0 6px 18px var(--shadow);
+    }
+
+    .icon-button:hover { background: var(--button-hover); }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .timer-card {
+      min-height: 42vh;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,0.06), transparent 56%),
+        var(--panel);
+      box-shadow: 0 20px 50px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      position: sticky;
+      top: 12px;
+      z-index: 5;
+    }
+
+    .phase {
+      color: var(--muted);
+      font-size: clamp(1.25rem, 4vw, 2rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .countdown {
+      line-height: 0.9;
+      font-size: clamp(7.5rem, 34vw, 18rem);
+      font-weight: 800;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 10px 35px rgba(0,0,0,0.38);
+    }
+
+    .pattern-name {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    button, select, input {
+      border: 1px solid #6b6b6b;
+      border-radius: 14px;
+      background: var(--button);
+      color: var(--text);
+      padding: 12px 14px;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 650;
+      box-shadow: 0 6px 16px var(--shadow);
+    }
+
+    button:hover { background: var(--button-hover); }
+
+    button.primary {
+      background: #6a6a6a;
+      border-color: #8a8a8a;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .settings {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .panel {
+      border-radius: 22px;
+      background: var(--panel);
+      padding: 16px;
+      box-shadow: 0 12px 34px var(--shadow);
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    .preset {
+      text-align: left;
+      background: var(--panel-2);
+      border-radius: 16px;
+      padding: 13px;
+      min-height: 112px;
+    }
+
+    .preset strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
+
+    .preset span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.35;
+      font-weight: 450;
+    }
+
+    .preset small {
+      display: block;
+      color: var(--text);
+      margin-top: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .custom-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    input {
+      width: 100%;
+      font-size: 1.1rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hint {
+      color: var(--muted);
+      line-height: 1.45;
+      margin: 10px 0 0;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.9rem;
+      padding-bottom: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .app { padding: 12px; gap: 12px; }
+      .timer-card {
+        min-height: 48vh;
+        border-radius: 22px;
+      }
+      .custom-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      button, select, input {
+        padding: 11px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Breathwork Timer</h1>
+      <button id="muteButton" class="icon-button" type="button" aria-label="Mute spoken countdown">🔊</button>
+    </header>
+
+    <main>
+      <section class="timer-card" aria-live="polite">
+        <div id="phase" class="phase">Ready</div>
+        <div id="countdown" class="countdown">0</div>
+        <div id="patternName" class="pattern-name">Choose a pattern or create your own.</div>
+        <div class="controls">
+          <button id="startPauseButton" class="primary" type="button">Start</button>
+          <button id="resetButton" type="button">Reset</button>
+          <button id="nextButton" type="button">Next step</button>
+        </div>
+      </section>
+
+      <section class="settings">
+        <div class="panel">
+          <h2>Common patterns</h2>
+          <div id="presetGrid" class="preset-grid"></div>
+          <p class="hint">Tip: choose the pattern that matches the state you want to invite, not the state you want to force. Tiny rudder, large ocean.</p>
+        </div>
+
+        <div class="panel">
+          <h2>Custom pattern</h2>
+          <div class="custom-grid">
+            <label>Inhale
+              <input id="inhaleInput" type="number" min="0" max="300" step="1" value="4" inputmode="numeric" />
+            </label>
+            <label>Hold
+              <input id="holdAfterInhaleInput" type="number" min="0" max="300" step="1" value="7" inputmode="numeric" />
+            </label>
+            <label>Exhale
+              <input id="exhaleInput" type="number" min="0" max="300" step="1" value="8" inputmode="numeric" />
+            </label>
+            <label>Hold
+              <input id="holdAfterExhaleInput" type="number" min="0" max="300" step="1" value="0" inputmode="numeric" />
+            </label>
+          </div>
+          <div class="controls">
+            <button id="applyCustomButton" type="button">Use custom pattern</button>
+          </div>
+          <p class="hint">Use 0 for any step you want to skip.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      Breathe gently. Stop if you feel dizzy, strained, or uncomfortable.
+    </footer>
+  </div>
+
+  <script>
+    const presets = [
+      {
+        name: "Box breathing",
+        times: [4, 4, 4, 4],
+        description: "Balanced and steady, useful when you want calm focus."
+      },
+      {
+        name: "4-7-8 breathing",
+        times: [4, 7, 8, 0],
+        description: "A longer exhale pattern often used for winding down."
+      },
+      {
+        name: "Coherent breathing",
+        times: [5, 0, 5, 0],
+        description: "Simple rhythmic breathing for a smooth, regulated feeling."
+      },
+      {
+        name: "Relaxing 4-6",
+        times: [4, 0, 6, 0],
+        description: "A gentle longer-exhale pattern for softening tension."
+      },
+      {
+        name: "Triangle breathing",
+        times: [4, 4, 4, 0],
+        description: "Three equal sides that feel structured without a final hold."
+      },
+      {
+        name: "Energizing 6-2-4",
+        times: [6, 2, 4, 0],
+        description: "A fuller inhale pattern for moments when you want more brightness."
+      },
+      {
+        name: "Buteyko-style light breath",
+        times: [3, 0, 3, 2],
+        description: "Soft nasal breathing with a small pause after exhale."
+      },
+      {
+        name: "Gentle sleep wave",
+        times: [4, 2, 8, 0],
+        description: "A quiet pattern with an elongated exhale for bedtime."
+      }
+    ];
+
+    const phaseLabels = ["Inhale", "Hold", "Exhale", "Hold"];
+    let activePattern = { name: "4-7-8 breathing", times: [4, 7, 8, 0] };
+    let phaseIndex = 0;
+    let remaining = activePattern.times[phaseIndex];
+    let running = false;
+    let muted = localStorage.getItem("breathwork-muted") === "true";
+    let intervalId = null;
+
+    const phaseEl = document.getElementById("phase");
+    const countdownEl = document.getElementById("countdown");
+    const patternNameEl = document.getElementById("patternName");
+    const startPauseButton = document.getElementById("startPauseButton");
+    const resetButton = document.getElementById("resetButton");
+    const nextButton = document.getElementById("nextButton");
+    const muteButton = document.getElementById("muteButton");
+    const presetGrid = document.getElementById("presetGrid");
+
+    const inputs = [
+      document.getElementById("inhaleInput"),
+      document.getElementById("holdAfterInhaleInput"),
+      document.getElementById("exhaleInput"),
+      document.getElementById("holdAfterExhaleInput")
+    ];
+
+    function validSteps(times) {
+      return times.map(Number).filter(n => Number.isFinite(n) && n > 0);
+    }
+
+    function normalizeTimes(times) {
+      return times.map(value => {
+        const n = Math.round(Number(value));
+        return Number.isFinite(n) && n >= 0 ? Math.min(n, 300) : 0;
+      });
+    }
+
+    function speak(text) {
+      if (muted || !("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(String(text));
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+      utterance.volume = 0.9;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function updateMuteButton() {
+      muteButton.textContent = muted ? "🔇" : "🔊";
+      muteButton.setAttribute("aria-label", muted ? "Unmute spoken countdown" : "Mute spoken countdown");
+    }
+
+    function currentDuration() {
+      return activePattern.times[phaseIndex] || 0;
+    }
+
+    function moveToNextNonZeroPhase() {
+      for (let i = 0; i < 4; i++) {
+        phaseIndex = (phaseIndex + 1) % 4;
+        if (activePattern.times[phaseIndex] > 0) {
+          remaining = activePattern.times[phaseIndex];
+          return;
+        }
+      }
+      remaining = 0;
+    }
+
+    function setPattern(pattern) {
+      activePattern = {
+        name: pattern.name,
+        times: normalizeTimes(pattern.times)
+      };
+
+      if (validSteps(activePattern.times).length === 0) {
+        activePattern.times = [4, 0, 4, 0];
+      }
+
+      phaseIndex = activePattern.times.findIndex(time => time > 0);
+      if (phaseIndex < 0) phaseIndex = 0;
+      remaining = currentDuration();
+      running = false;
+      clearInterval(intervalId);
+      intervalId = null;
+      render();
+    }
+
+    function render() {
+      phaseEl.textContent = remaining > 0 ? phaseLabels[phaseIndex] : "Ready";
+      countdownEl.textContent = remaining;
+      patternNameEl.textContent = `${activePattern.name} · ${activePattern.times.join("-")} sec`;
+      startPauseButton.textContent = running ? "Pause" : "Start";
+      updateMuteButton();
+    }
+
+    function tick() {
+      if (!running) return;
+
+      remaining -= 1;
+
+      if (remaining <= 0) {
+        moveToNextNonZeroPhase();
+        speak(phaseLabels[phaseIndex]);
+      } else {
+        speak(remaining);
+      }
+
+      render();
+    }
+
+    function start() {
+      if (validSteps(activePattern.times).length === 0) return;
+      running = true;
+      speak(phaseLabels[phaseIndex]);
+      render();
+
+      clearInterval(intervalId);
+      intervalId = setInterval(tick, 1000);
+    }
+
+    function pause() {
+      running = false;
+      clearInterval(intervalId);
+      intervalId = null;
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      render();
+    }
+
+    function reset() {
+      pause();
+      phaseIndex = activePattern.times.findIndex(time => time > 0);
+      if (phaseIndex < 0) phaseIndex = 0;
+      remaining = currentDuration();
+      render();
+    }
+
+    function nextStep() {
+      moveToNextNonZeroPhase();
+      speak(phaseLabels[phaseIndex]);
+      render();
+    }
+
+    function buildPresets() {
+      presetGrid.innerHTML = "";
+      presets.forEach(preset => {
+        const button = document.createElement("button");
+        button.className = "preset";
+        button.type = "button";
+        button.innerHTML = `
+          <strong>${preset.name}</strong>
+          <span>${preset.description}</span>
+          <small>${preset.times.join("-")} sec</small>
+        `;
+        button.addEventListener("click", () => {
+          inputs.forEach((input, index) => input.value = preset.times[index]);
+          setPattern(preset);
+        });
+        presetGrid.appendChild(button);
+      });
+    }
+
+    startPauseButton.addEventListener("click", () => running ? pause() : start());
+    resetButton.addEventListener("click", reset);
+    nextButton.addEventListener("click", nextStep);
+
+    muteButton.addEventListener("click", () => {
+      muted = !muted;
+      localStorage.setItem("breathwork-muted", String(muted));
+      if (muted && "speechSynthesis" in window) window.speechSynthesis.cancel();
+      render();
+    });
+
+    document.getElementById("applyCustomButton").addEventListener("click", () => {
+      const times = normalizeTimes(inputs.map(input => input.value));
+      setPattern({ name: "Custom pattern", times });
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js");
+      });
+    }
+
+    buildPresets();
+    setPattern(activePattern);
+  </script>
+</body>
+</html>
