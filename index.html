@@ -56,7 +56,18 @@
     body.session-active .timer-card{min-height:100vh;width:100%;border-radius:0;position:static;box-shadow:none;padding:88px 18px 24px;background:radial-gradient(circle at center,rgba(255,255,255,.07),transparent 58%),var(--bg)}
     body.session-active .countdown{font-size:clamp(10rem,44vw,25rem)}
     body.session-active .phase{font-size:clamp(1.4rem,5vw,2.4rem)}
-    body.session-active .controls{position:fixed;left:14px;right:14px;bottom:14px;z-index:25;margin:0}
+    body.session-active .controls {
+      position: fixed;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      z-index: 25;
+      margin: 0;
+
+      display: block;        /* prevents flex overflow */
+      width: auto;           /* ensures it respects left/right */
+      max-width: calc(100% - 28px); /* safety clamp */
+    }
     @media(max-width:640px){.app{padding:12px;gap:12px}.timer-card{min-height:43vh;border-radius:22px}.custom-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.menu{padding:12px}.menu-list,.preset-grid,.voice-grid{grid-template-columns:1fr}}
   </style>
 </head>
