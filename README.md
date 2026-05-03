@@ -69,3 +69,20 @@ If a clip cannot play, the app falls back to browser text-to-speech.
 ## GitHub Pages
 
 Upload the project contents to the root of your GitHub Pages repository.
+
+
+## Cache behavior in v4.2
+
+- All MP3 files in `audio/heart`, `audio/velvet`, and `audio/light` are precached for offline use.
+- Code files such as `index.html`, `service-worker.js`, `manifest.json`, CSS, and JavaScript are not cached by the service worker.
+- App code updates should be picked up fresh, while voice clips remain available offline.
+
+After deploying this version, close/reopen the PWA or refresh twice if your browser still has an older service worker installed.
+
+
+## Cache behavior in v4.3
+
+- Any file requested from the `/audio/` folder is cached automatically.
+- This includes future MP3 files you add later, without modifying the service worker.
+- Code files such as `index.html`, `service-worker.js`, `manifest.json`, CSS, and JavaScript are not cached by the service worker.
+- Important: browsers cannot automatically discover every file in a folder. A new audio file is cached after the app requests it at least once.
